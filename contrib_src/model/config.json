@@ -30,7 +30,7 @@
         "format": ["image/png", "image/jpg", "image/jpeg"],
         "dim_limits": [
           {
-            "min": 3,
+            "min": 1,
             "max": 4
           },
           {
