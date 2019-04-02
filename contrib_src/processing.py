@@ -12,7 +12,7 @@ class ImageProcessor(ImageProcessorBase):
     def _preprocessBeforeConversionToNumpy(self, image):
         if isinstance(image, PIL.Image.Image):
             # resize here
-            image = image.resize((224,224), resample = PIL.Image.LANCZOS)
+            # image = image.resize((224,224), resample = PIL.Image.LANCZOS)
             image = np.array(image).astype(np.float32)
             if len(image.shape) > 2:
                 image = image[:,:,0:3]
@@ -23,9 +23,12 @@ class ImageProcessor(ImageProcessorBase):
             raise IOError("Image Type not supported for preprocessing.")
 
     def _preprocessAfterConversionToNumpy(self, npArr):
-        # reshape, convert to batch, and float32
-        arr = mx.nd.array(npArr.reshape(1, 3,224,224).astype(np.float32))
-        return arr
+        img = mx.nd.array(npArr)
+        img = mx.image.imresize(img, 224, 224) # resize
+        img = img.transpose((2, 0, 1)) # Channel first
+        img = img.expand_dims(axis=0) # batchify
+        img = img.astype('float32')
+        return img
 
     def computeOutput(self, inferenceResults):
         probs = np.squeeze(np.asarray(inferenceResults))
